@@ -1,11 +1,39 @@
 import time 
 import sys 
+import os 
+import pyttsx3
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from gtts import gTTS 
+  
+# This module is imported so that we can  
+# play the converted audio 
+  
+# The text that you want to convert to audio 
+  
+# Language in which you want to convert 
+language = 'en'
+  
+# Passing the text and language to the engine,  
+# here we have marked slow=False. Which tells  
+# the module that the converted audio should  
+# have a high speed 
+
+  
+# Saving the converted audio in a mp3 file named 
+# welcome  
+
+engine = pyttsx3.init('sapi5')
+voice = engine.getProperty('voices')
+engine.setProperty('voice',voice[1].id)
+
+def speak(audio):
+    engine.say(audio)
+    engine.runAndWait()
 
 def run():
     PATH = "C:\Program Files (x86)\chromedriver.exe"
@@ -34,8 +62,21 @@ def run():
             EC.presence_of_element_located((By.XPATH, "//*[@id='search']/div[1]/div[2]/div/span[3]/div[2]"))
         )
 
+        # Seaching for the product
+        st = driver.find_element_by_id("high-price")
+        st.send_keys("5000")
+        driver.find_element_by_xpath("//*[@id='a-autoid-1']/span/input").click()
+        #st.send_keys(Keys.RETURN)
+        
         # Selecting the best selling item
-        item = driver.find_element_by_xpath("//*[@id='search']/div[1]/div[2]/div/span[3]/div[2]/div[3]/div/span/div/div/div/div/div[2]/div[2]/div/div[1]/div/div/div[1]/h2/a/span").click()
+        item = driver.find_element_by_xpath("//*[@id='search']/div[1]/div[2]/div/span[3]/div[2]/div[3]/div/span/div/div/div/div/div[2]/div[2]/div/div[1]/div/div/div[1]/h2/a/span")
+        price = driver.find_element_by_xpath("//*[@id='search']/div[1]/div[2]/div/span[3]/div[2]/div[3]/div/span/div/div/div/div/div[2]/div[2]/div/div[2]/div[1]/div/div[1]/div[2]/div/div/a/span[1]/span[2]/span[2]")
+        print(item.text,price.text)
+
+        mytext = item.text + "Cost is " + price.text
+        speak(mytext) 
+        
+        item.click()
         driver.switch_to.window(driver.window_handles[1])
         
         # Adding to cart 
